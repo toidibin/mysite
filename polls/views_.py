@@ -2,7 +2,6 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from django.views import generic
 from .models import Question, Choice
 # Create your views here.
 # Django 中的视图的概念是「一类具有相同功能和模板的网页的集合」
@@ -13,25 +12,30 @@ from .models import Question, Choice
 # 可以生成一个 PDF 文件，可以输出一个 XML，创建一个 ZIP 文件，你可以做任何你想做的事，使用任何你想用的 Python 库
 
 
-class IndexView(generic.ListView):	
-	template_name = 'polls/index.html'
-	context_object_name = 'latest_question_list' # 提供 context_object_name 属性，表示我们想使用 latest_question_list
+def index(request):	
+	latest_question_list = Question.objects.order_by('-pub_date')[:5]
+	template = loader.get_template('polls/index.html')
+	context = {
+		'latest_question_list': latest_question_list
+	}
+	return render(request, 'polls/index.html', context) # 载入模板，填充上下文，再返回由它生成的 HttpResponse 对象 render快捷函数 不再需要导入loader httpResponse
+	# return HttpResponse(template.render(context, request))
+	# output = ', '.join([q.question_text for q in latest_question_list])
+	# return HttpResponse(output)
 
-	def get_queryset(self):
-		""" return the last five published questions"""
-		return Question.objects.order_by('-pub_date')[:5]
+def detail(request, question_id):
+	# try:
+	# 	question = Question.objects.get(pk=question_id)
+	# except Question.DoesNotExist:
+	# 	raise Http404("Question does not exist")
+	question = get_object_or_404(Question, pk=question_id)
+	return render(request, 'polls/detail.html', {'question': question})
+  # return HttpResponse("You're looking at question %s." % question_id) 1
 
-# 通用视图
-# 每个通用视图需要知道它将作用于哪个模型。 这由 model 属性提供
-# template_name 属性是用来告诉 Django 使用一个指定的模板名字
-class DetailView(generic.DetailView):
-	model = Question
-	template_name = 'polls/detail.html'  # DetailView 期望从 URL 中捕获名为 "pk" 的主键值，所以我们为通用视图把 question_id 改成 pk
-
-# 通用视图
-class ResultsView(generic.DetailView):
-	model = Question
-	template_name = 'polls/results.html'
+def results(request, question_id):
+	question = get_object_or_404(Question, pk=question_id)
+	return render(request, 'polls/result.html', {'question': question})
+  # return HttpResponse(response % question_id)
 
 def vote(request, question_id):
 	question = get_object_or_404(Question, pk=question_id)

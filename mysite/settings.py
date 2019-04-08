@@ -56,7 +56,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
-        'APP_DIRS': True,
+        'APP_DIRS': True,  # 让DjangoTemplates 在每个INSTALLED_APPS文件夹中寻找”template"子目录
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
