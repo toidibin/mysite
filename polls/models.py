@@ -18,7 +18,7 @@ class Question(models.Model):
 	pub_date = models.DateTimeField('date published')
 
 	# 自定义方法
-	def was_publiced_recently(self):
+	def was_published_recently(self):
 		return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
 
 	# 打印一个类的时候，print首先调用的是类里面定义的__str__
